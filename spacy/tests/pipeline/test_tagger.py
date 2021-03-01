@@ -73,20 +73,22 @@ def test_no_resize():
 def test_implicit_label():
     nlp = Language()
     nlp.add_pipe("tagger")
-    train_examples = []
-    for t in TRAIN_DATA:
-        train_examples.append(Example.from_dict(nlp.make_doc(t[0]), t[1]))
+    train_examples = [
+        Example.from_dict(nlp.make_doc(t[0]), t[1]) for t in TRAIN_DATA
+    ]
+
     nlp.initialize(get_examples=lambda: train_examples)
 
 
 def test_initialize_examples():
     nlp = Language()
     tagger = nlp.add_pipe("tagger")
-    train_examples = []
     for tag in TAGS:
         tagger.add_label(tag)
-    for t in TRAIN_DATA:
-        train_examples.append(Example.from_dict(nlp.make_doc(t[0]), t[1]))
+    train_examples = [
+        Example.from_dict(nlp.make_doc(t[0]), t[1]) for t in TRAIN_DATA
+    ]
+
     # you shouldn't really call this more than once, but for testing it should be fine
     nlp.initialize()
     nlp.initialize(get_examples=lambda: train_examples)
@@ -109,9 +111,10 @@ def test_no_data():
     nlp = English()
     nlp.add_pipe("tagger")
     nlp.add_pipe("textcat")
-    train_examples = []
-    for t in TEXTCAT_DATA:
-        train_examples.append(Example.from_dict(nlp.make_doc(t[0]), t[1]))
+    train_examples = [
+        Example.from_dict(nlp.make_doc(t[0]), t[1]) for t in TEXTCAT_DATA
+    ]
+
     with pytest.raises(ValueError):
         nlp.initialize(get_examples=lambda: train_examples)
 
@@ -120,11 +123,12 @@ def test_incomplete_data():
     # Test that the tagger works with incomplete information
     nlp = English()
     nlp.add_pipe("tagger")
-    train_examples = []
-    for t in PARTIAL_DATA:
-        train_examples.append(Example.from_dict(nlp.make_doc(t[0]), t[1]))
+    train_examples = [
+        Example.from_dict(nlp.make_doc(t[0]), t[1]) for t in PARTIAL_DATA
+    ]
+
     optimizer = nlp.initialize(get_examples=lambda: train_examples)
-    for i in range(50):
+    for _ in range(50):
         losses = {}
         nlp.update(train_examples, sgd=optimizer, losses=losses)
     assert losses["tagger"] < 0.00001
@@ -140,13 +144,14 @@ def test_overfitting_IO():
     # Simple test to try and quickly overfit the tagger - ensuring the ML models work correctly
     nlp = English()
     tagger = nlp.add_pipe("tagger")
-    train_examples = []
-    for t in TRAIN_DATA:
-        train_examples.append(Example.from_dict(nlp.make_doc(t[0]), t[1]))
+    train_examples = [
+        Example.from_dict(nlp.make_doc(t[0]), t[1]) for t in TRAIN_DATA
+    ]
+
     optimizer = nlp.initialize(get_examples=lambda: train_examples)
     assert tagger.model.get_dim("nO") == len(TAGS)
 
-    for i in range(50):
+    for _ in range(50):
         losses = {}
         nlp.update(train_examples, sgd=optimizer, losses=losses)
     assert losses["tagger"] < 0.00001

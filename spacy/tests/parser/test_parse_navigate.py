@@ -83,13 +83,9 @@ def test_parser_parse_navigate_child_consistency(en_vocab, words, heads):
     rights = {}
     for head in doc:
         assert head.i not in lefts
-        lefts[head.i] = set()
-        for left in head.lefts:
-            lefts[head.i].add(left.i)
+        lefts[head.i] = {left.i for left in head.lefts}
         assert head.i not in rights
-        rights[head.i] = set()
-        for right in head.rights:
-            rights[head.i].add(right.i)
+        rights[head.i] = {right.i for right in head.rights}
     for head in doc:
         assert head.n_rights == len(rights[head.i])
         assert head.n_lefts == len(lefts[head.i])

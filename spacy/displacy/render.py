@@ -81,7 +81,7 @@ class DependencyRenderer:
             svg = self.render_svg(render_id, p["words"], p["arcs"])
             rendered.append(svg)
         if page:
-            content = "".join([TPL_FIGURE.format(content=svg) for svg in rendered])
+            content = "".join(TPL_FIGURE.format(content=svg) for svg in rendered)
             markup = TPL_PAGE.format(
                 content=content, lang=self.lang, dir=self.direction
             )
@@ -268,10 +268,7 @@ class EntityRenderer:
         if template:
             self.ent_template = template
         else:
-            if self.direction == "rtl":
-                self.ent_template = TPL_ENT_RTL
-            else:
-                self.ent_template = TPL_ENT
+            self.ent_template = TPL_ENT_RTL if self.direction == "rtl" else TPL_ENT
 
     def render(
         self, parsed: List[Dict[str, Any]], page: bool = False, minify: bool = False
@@ -291,7 +288,7 @@ class EntityRenderer:
                 self.lang = settings.get("lang", DEFAULT_LANG)
             rendered.append(self.render_ents(p["text"], p["ents"], p.get("title")))
         if page:
-            docs = "".join([TPL_FIGURE.format(content=doc) for doc in rendered])
+            docs = "".join(TPL_FIGURE.format(content=doc) for doc in rendered)
             markup = TPL_PAGE.format(content=docs, lang=self.lang, dir=self.direction)
         else:
             markup = "".join(rendered)

@@ -12,11 +12,11 @@ class SpanishLemmatizer(Lemmatizer):
 
     @classmethod
     def get_lookups_config(cls, mode: str) -> Tuple[List[str], List[str]]:
-        if mode == "rule":
-            required = ["lemma_rules", "lemma_rules_groups", "lemma_index", "lemma_exc"]
-            return (required, [])
-        else:
+        if mode != "rule":
             return super().get_lookups_config(mode)
+
+        required = ["lemma_rules", "lemma_rules_groups", "lemma_index", "lemma_exc"]
+        return (required, [])
 
     def rule_lemmatize(self, token: Token) -> List[str]:
         cache_key = (token.orth, token.pos, str(token.morph))
@@ -48,10 +48,7 @@ class SpanishLemmatizer(Lemmatizer):
         if exc is not None:
             lemmas = list(exc)
         else:
-            if pos == "aux":
-                rule_pos = "verb"
-            else:
-                rule_pos = pos
+            rule_pos = "verb" if pos == "aux" else pos
             rule = self.select_rule(rule_pos, features)
             index = self.lookups.get_table("lemma_index").get(rule_pos, [])
             lemmas = getattr(self, "lemmatize_" + rule_pos)(
@@ -87,8 +84,6 @@ class SpanishLemmatizer(Lemmatizer):
 
         # Initialize empty lists for the generated lemmas
         possible_lemmas = []
-        selected_lemmas = []
-
         # Apply lemmatization rules
         for old, new in self.lookups.get_table("lemma_rules").get(rule, []):
             possible_lemma = re.sub(old + "$", new, word)
@@ -107,12 +102,11 @@ class SpanishLemmatizer(Lemmatizer):
                         additional_lemmas.append(re.sub(old, new, possible_lemma))
         possible_lemmas.extend(additional_lemmas)
 
-        for lemma in possible_lemmas:
-            if lemma in index:
-                selected_lemmas.append(lemma)
+        selected_lemmas = [lemma for lemma in possible_lemmas if lemma in index]
+
         # If one or more of the created possible lemmas are in the lookup list,
         # return all of them
-        if len(selected_lemmas) > 0:
+        if selected_lemmas:
             return selected_lemmas
         elif len(possible_lemmas) > 0:
             return possible_lemmas
@@ -208,8 +202,6 @@ class SpanishLemmatizer(Lemmatizer):
 
         # Initialize empty lists for the generated lemmas
         possible_lemmas = []
-        selected_lemmas = []
-
         # Apply lemmatization rules
         for old, new in self.lookups.get_table("lemma_rules").get(rule, []):
             possible_lemma = re.sub(old + "$", new, word)
@@ -228,12 +220,11 @@ class SpanishLemmatizer(Lemmatizer):
                         additional_lemmas.append(re.sub(old, new, possible_lemma))
         possible_lemmas.extend(additional_lemmas)
 
-        for lemma in possible_lemmas:
-            if lemma in index:
-                selected_lemmas.append(lemma)
+        selected_lemmas = [lemma for lemma in possible_lemmas if lemma in index]
+
         # If one or more of the created possible lemmas are in the lookup list,
         # return all of them
-        if len(selected_lemmas) > 0:
+        if selected_lemmas:
             return selected_lemmas
         elif len(possible_lemmas) > 0:
             return possible_lemmas
@@ -339,18 +330,15 @@ class SpanishLemmatizer(Lemmatizer):
 
         # Initialize empty lists for the generated lemmas
         possible_lemmas = []
-        selected_lemmas = []
-
         # Apply lemmatization rules
         for old, new in self.lookups.get_table("lemma_rules").get(rule, []):
             possible_lemma = re.sub(old + "$", new, word)
             if possible_lemma != word:
                 possible_lemmas.append(possible_lemma)
 
-        for lemma in possible_lemmas:
-            if lemma in index:
-                selected_lemmas.append(lemma)
-        if len(selected_lemmas) == 0:
+        selected_lemmas = [lemma for lemma in possible_lemmas if lemma in index]
+
+        if not selected_lemmas:
             # If none of the possible lemmas are in the lookup list,
             # apply vocalic alternation rules and search in the lookup list
             # again
@@ -381,7 +369,7 @@ class SpanishLemmatizer(Lemmatizer):
 
         # If one or more of the created possible lemmas are in the lookup list,
         # return all of them
-        if len(selected_lemmas) > 0:
+        if selected_lemmas:
             return selected_lemmas
         elif len(possible_lemmas) > 0:
             return possible_lemmas

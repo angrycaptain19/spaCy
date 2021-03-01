@@ -145,9 +145,7 @@ class EntityRuler(Pipe):
 
     def match(self, doc: Doc):
         matches = list(self.matcher(doc)) + list(self.phrase_matcher(doc))
-        matches = set(
-            [(m_id, start, end) for m_id, start, end in matches if start != end]
-        )
+        matches = {(m_id, start, end) for m_id, start, end in matches if start != end}
         get_sort_key = lambda m: (m[2] - m[1], -m[1])
         matches = sorted(matches, key=get_sort_key, reverse=True)
         return matches
@@ -171,9 +169,7 @@ class EntityRuler(Pipe):
                 else:
                     span = Span(doc, start, end, label=match_id)
                 new_entities.append(span)
-                entities = [
-                    e for e in entities if not (e.start < end and e.end > start)
-                ]
+                entities = [e for e in entities if e.start >= end or e.end <= start]
                 seen_tokens.update(range(start, end))
         doc.ents = entities + new_entities
 

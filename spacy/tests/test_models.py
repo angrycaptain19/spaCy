@@ -78,7 +78,7 @@ def test_multi_hash_embed():
     # Check they look at different columns.
     assert list(sorted(he.attrs["column"] for he in hash_embeds)) == [0, 1, 2]
     # Check they use different seeds
-    assert len(set(he.attrs["seed"] for he in hash_embeds)) == 3
+    assert len({he.attrs["seed"] for he in hash_embeds}) == 3
     # Check they all have the same number of rows
     assert [he.get_dim("nV") for he in hash_embeds] == [500, 500, 500]
     # Now try with different row factors

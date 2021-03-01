@@ -2,7 +2,7 @@ from thinc.api import Model, normal_init
 
 
 def PrecomputableAffine(nO, nI, nF, nP, dropout=0.1):
-    model = Model(
+    return Model(
         "precomputable_affine",
         forward,
         init=init,
@@ -10,7 +10,6 @@ def PrecomputableAffine(nO, nI, nF, nP, dropout=0.1):
         params={"W": None, "b": None, "pad": None},
         attrs={"dropout_rate": dropout},
     )
-    return model
 
 
 def forward(model, X, is_train):

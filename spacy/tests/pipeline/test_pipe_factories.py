@@ -472,7 +472,7 @@ def test_pipe_factories_decorator_idempotent(i, func, func2):
     want spaCy to raise an error if a module registering components is reloaded.
     """
     name = f"test_pipe_factories_decorator_idempotent_{i}"
-    for i in range(5):
+    for _ in range(5):
         Language.factory(name, func=func)
     nlp = Language()
     nlp.add_pipe(name)
@@ -480,7 +480,7 @@ def test_pipe_factories_decorator_idempotent(i, func, func2):
     # Make sure it also works for component decorator, which creates the
     # factory function
     name2 = f"{name}2"
-    for i in range(5):
+    for _ in range(5):
         Language.component(name2, func=func2)
     nlp = Language()
     nlp.add_pipe(name)

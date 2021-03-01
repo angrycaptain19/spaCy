@@ -182,7 +182,7 @@ def test_is_sent_start(en_tokenizer):
     doc = en_tokenizer("This is a sentence. This is another.")
     assert doc[5].is_sent_start is None
     doc[5].is_sent_start = True
-    assert doc[5].is_sent_start is True
+    assert doc[5].is_sent_start
     assert len(list(doc.sents)) == 2
 
 

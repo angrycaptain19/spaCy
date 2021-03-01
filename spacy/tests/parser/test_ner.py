@@ -43,7 +43,7 @@ def entity_annots(doc):
 
 @pytest.fixture
 def entity_types(entity_annots):
-    return sorted(set([label for (s, e, label) in entity_annots]))
+    return sorted({label for (s, e, label) in entity_annots})
 
 
 @pytest.fixture
@@ -200,13 +200,14 @@ def test_train_empty():
     ]
 
     nlp = English()
-    train_examples = []
-    for t in train_data:
-        train_examples.append(Example.from_dict(nlp.make_doc(t[0]), t[1]))
+    train_examples = [
+        Example.from_dict(nlp.make_doc(t[0]), t[1]) for t in train_data
+    ]
+
     ner = nlp.add_pipe("ner", last=True)
     ner.add_label("PERSON")
     nlp.initialize()
-    for itn in range(2):
+    for _ in range(2):
         losses = {}
         batches = util.minibatch(train_examples, size=8)
         for batch in batches:
@@ -313,7 +314,7 @@ def test_overfitting_IO(use_upper):
             ner.add_label(ent[2])
     optimizer = nlp.initialize()
 
-    for i in range(50):
+    for _ in range(50):
         losses = {}
         nlp.update(train_examples, sgd=optimizer, losses=losses)
     assert losses["ner"] < 0.00001
@@ -412,7 +413,7 @@ def test_beam_overfitting_IO():
     optimizer = nlp.initialize()
 
     # run overfitting
-    for i in range(50):
+    for _ in range(50):
         losses = {}
         nlp.update(train_examples, sgd=optimizer, losses=losses)
     assert losses["beam_ner"] < 0.0001

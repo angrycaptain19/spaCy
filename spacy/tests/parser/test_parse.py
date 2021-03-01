@@ -206,7 +206,7 @@ def test_parser_set_sent_starts(en_vocab):
     # fmt: on
     doc = Doc(en_vocab, words=words, deps=deps, heads=heads)
     for i in range(len(words)):
-        if i == 0 or i == 3:
+        if i in [0, 3]:
             assert doc[i].is_sent_start is True
         else:
             assert doc[i].is_sent_start is False
@@ -227,7 +227,7 @@ def test_incomplete_data(pipe_name):
             if dep is not None:
                 parser.add_label(dep)
     optimizer = nlp.initialize(get_examples=lambda: train_examples)
-    for i in range(150):
+    for _ in range(150):
         losses = {}
         nlp.update(train_examples, sgd=optimizer, losses=losses)
     assert losses[pipe_name] < 0.0001
@@ -253,7 +253,7 @@ def test_overfitting_IO(pipe_name):
             parser.add_label(dep)
     optimizer = nlp.initialize()
     # run overfitting
-    for i in range(200):
+    for _ in range(200):
         losses = {}
         nlp.update(train_examples, sgd=optimizer, losses=losses)
     assert losses[pipe_name] < 0.0001
@@ -310,7 +310,7 @@ def test_beam_parser_scores():
     optimizer = nlp.initialize()
 
     # update a bit with conflicting data
-    for i in range(10):
+    for _ in range(10):
         losses = {}
         nlp.update(train_examples, sgd=optimizer, losses=losses)
 
@@ -347,7 +347,7 @@ def test_beam_overfitting_IO():
             parser.add_label(dep)
     optimizer = nlp.initialize()
     # run overfitting
-    for i in range(150):
+    for _ in range(150):
         losses = {}
         nlp.update(train_examples, sgd=optimizer, losses=losses)
     assert losses["beam_parser"] < 0.0001

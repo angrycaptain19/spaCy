@@ -96,13 +96,14 @@ def verify_cli_args(config_path, output_dir, resume_path, epoch_resume):
             )
     if resume_path is not None:
         model_name = re.search(r"model\d+\.bin", str(resume_path))
-        if not model_name and not epoch_resume:
-            msg.fail(
-                "You have to use the --epoch-resume setting when using a renamed weight file for --resume-path",
-                exits=True,
-            )
-        elif not model_name and epoch_resume < 0:
-            msg.fail(
-                f"The argument --epoch-resume has to be greater or equal to 0. {epoch_resume} is invalid",
-                exits=True,
-            )
+        if not model_name:
+            if not epoch_resume:
+                msg.fail(
+                    "You have to use the --epoch-resume setting when using a renamed weight file for --resume-path",
+                    exits=True,
+                )
+            elif epoch_resume < 0:
+                msg.fail(
+                    f"The argument --epoch-resume has to be greater or equal to 0. {epoch_resume} is invalid",
+                    exits=True,
+                )

@@ -32,8 +32,7 @@ def text():
 
 @pytest.fixture
 def doc(en_tokenizer, text):
-    doc = en_tokenizer(" ".join(text))
-    return doc
+    return en_tokenizer(" ".join(text))
 
 
 @pytest.mark.parametrize(

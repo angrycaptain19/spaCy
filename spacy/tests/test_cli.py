@@ -165,11 +165,11 @@ def test_cli_converters_iob_to_docs():
     assert converted["id"] == 0
     assert len(converted["paragraphs"]) == 1
     assert len(converted["paragraphs"][0]["sentences"]) == 4
-    for i in range(0, 4):
+    expected = ["I", "like", "London", "and", "New", "York", "City", "."]
+    for i in range(4):
         sent = converted["paragraphs"][0]["sentences"][i]
         assert len(sent["tokens"]) == 8
         tokens = sent["tokens"]
-        expected = ["I", "like", "London", "and", "New", "York", "City", "."]
         assert [t["orth"] for t in tokens] == expected
     assert len(converted_docs[0].ents) == 8
     for ent in converted_docs[0].ents:
@@ -232,7 +232,7 @@ def test_cli_converters_conll_ner_to_docs():
     assert converted["id"] == 0
     assert len(converted["paragraphs"]) == 1
     assert len(converted["paragraphs"][0]["sentences"]) == 5
-    for i in range(0, 5):
+    for i in range(5):
         sent = converted["paragraphs"][0]["sentences"][i]
         assert len(sent["tokens"]) == 8
         tokens = sent["tokens"]

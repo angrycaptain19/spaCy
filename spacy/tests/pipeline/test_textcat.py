@@ -54,7 +54,7 @@ def test_simple_train():
     textcat = nlp.add_pipe("textcat")
     textcat.add_label("answer")
     nlp.initialize()
-    for i in range(5):
+    for _ in range(5):
         for text, answer in [
             ("aaaa", 1.0),
             ("bbbb", 0),
@@ -84,7 +84,7 @@ def test_textcat_learns_multilabel():
     for letter in letters:
         textcat.add_label(letter)
     optimizer = textcat.initialize(lambda: [])
-    for i in range(30):
+    for _ in range(30):
         losses = {}
         examples = [Example.from_dict(doc, {"cats": cats}) for doc, cat in docs]
         textcat.update(examples, sgd=optimizer, losses=losses)
@@ -147,9 +147,11 @@ def test_no_resize(name):
 def test_error_with_multi_labels():
     nlp = Language()
     nlp.add_pipe("textcat")
-    train_examples = []
-    for text, annotations in TRAIN_DATA_MULTI_LABEL:
-        train_examples.append(Example.from_dict(nlp.make_doc(text), annotations))
+    train_examples = [
+        Example.from_dict(nlp.make_doc(text), annotations)
+        for text, annotations in TRAIN_DATA_MULTI_LABEL
+    ]
+
     with pytest.raises(ValueError):
         nlp.initialize(get_examples=lambda: train_examples)
 
@@ -182,13 +184,15 @@ def test_overfitting_IO():
     nlp = English()
     textcat = nlp.add_pipe("textcat")
 
-    train_examples = []
-    for text, annotations in TRAIN_DATA_SINGLE_LABEL:
-        train_examples.append(Example.from_dict(nlp.make_doc(text), annotations))
+    train_examples = [
+        Example.from_dict(nlp.make_doc(text), annotations)
+        for text, annotations in TRAIN_DATA_SINGLE_LABEL
+    ]
+
     optimizer = nlp.initialize(get_examples=lambda: train_examples)
     assert textcat.model.get_dim("nO") == 2
 
-    for i in range(50):
+    for _ in range(50):
         losses = {}
         nlp.update(train_examples, sgd=optimizer, losses=losses)
     assert losses["textcat"] < 0.01
@@ -232,13 +236,15 @@ def test_overfitting_IO_multi():
     nlp = English()
     textcat = nlp.add_pipe("textcat_multilabel")
 
-    train_examples = []
-    for text, annotations in TRAIN_DATA_MULTI_LABEL:
-        train_examples.append(Example.from_dict(nlp.make_doc(text), annotations))
+    train_examples = [
+        Example.from_dict(nlp.make_doc(text), annotations)
+        for text, annotations in TRAIN_DATA_MULTI_LABEL
+    ]
+
     optimizer = nlp.initialize(get_examples=lambda: train_examples)
     assert textcat.model.get_dim("nO") == 3
 
-    for i in range(100):
+    for _ in range(100):
         losses = {}
         nlp.update(train_examples, sgd=optimizer, losses=losses)
     assert losses["textcat_multilabel"] < 0.01

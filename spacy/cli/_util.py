@@ -220,7 +220,7 @@ def validate_project_commands(config: Dict[str, Any]) -> None:
     """
     command_names = [cmd["name"] for cmd in config.get("commands", [])]
     workflows = config.get("workflows", {})
-    duplicates = set([cmd for cmd in command_names if command_names.count(cmd) > 1])
+    duplicates = {cmd for cmd in command_names if command_names.count(cmd) > 1}
     if duplicates:
         err = f"Duplicate commands defined in {PROJECT_FILE}: {', '.join(duplicates)}"
         msg.fail(err, exits=1)
@@ -431,7 +431,7 @@ def git_sparse_checkout(repo, subpath, dest, branch):
         ret = run_command(cmd, capture=True)
         git_repo = _http_to_git(repo)
         # Now pass those missings into another bit of git internals
-        missings = " ".join([x[1:] for x in ret.stdout.split() if x.startswith("?")])
+        missings = " ".join(x[1:] for x in ret.stdout.split() if x.startswith("?"))
         if not missings:
             err = (
                 f"Could not find any relevant files for '{subpath}'. "

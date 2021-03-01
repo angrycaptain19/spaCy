@@ -20,9 +20,9 @@ for orth in ID_BASE_EXCEPTIONS:
     orth_first_upper = orth[0].upper() + orth[1:]
     _exc[orth_first_upper] = [{ORTH: orth_first_upper}]
     if "-" in orth:
-        orth_title = "-".join([part.title() for part in orth.split("-")])
+        orth_title = "-".join(part.title() for part in orth.split("-"))
         _exc[orth_title] = [{ORTH: orth_title}]
-        orth_caps = "-".join([part.upper() for part in orth.split("-")])
+        orth_caps = "-".join(part.upper() for part in orth.split("-"))
         _exc[orth_caps] = [{ORTH: orth_caps}]
 
 for exc_data in [

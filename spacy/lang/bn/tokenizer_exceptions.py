@@ -3,10 +3,7 @@ from ...symbols import ORTH, NORM
 from ...util import update_exc
 
 
-_exc = {}
-
-
-for exc_data in [
+_exc = {exc_data[ORTH]: [exc_data] for exc_data in [
     {ORTH: "ডঃ", NORM: "ডক্টর"},
     {ORTH: "ডাঃ", NORM: "ডাক্তার"},
     {ORTH: "ড.", NORM: "ডক্টর"},
@@ -19,8 +16,7 @@ for exc_data in [
     {ORTH: "সে.মি.", NORM: "সেন্টিমিটার"},
     {ORTH: "সে.মি", NORM: "সেন্টিমিটার"},
     {ORTH: "মি.লি.", NORM: "মিলিলিটার"},
-]:
-    _exc[exc_data[ORTH]] = [exc_data]
+]}
 
 
 TOKENIZER_EXCEPTIONS = update_exc(BASE_EXCEPTIONS, _exc)

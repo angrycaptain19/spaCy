@@ -813,6 +813,6 @@ class MatchPatternError(ValueError):
         """
         msg = f"Invalid token patterns for matcher rule '{key}'\n"
         for pattern_idx, error_msgs in errors.items():
-            pattern_errors = "\n".join([f"- {e}" for e in error_msgs])
+            pattern_errors = "\n".join(f"- {e}" for e in error_msgs)
             msg += f"\nPattern {pattern_idx}:\n{pattern_errors}\n"
         ValueError.__init__(self, msg)

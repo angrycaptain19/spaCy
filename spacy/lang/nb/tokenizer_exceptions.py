@@ -3,10 +3,7 @@ from ...symbols import ORTH, NORM
 from ...util import update_exc
 
 
-_exc = {}
-
-
-for exc_data in [
+_exc = {exc_data[ORTH]: [exc_data] for exc_data in [
     {ORTH: "jan.", NORM: "januar"},
     {ORTH: "feb.", NORM: "februar"},
     {ORTH: "mar.", NORM: "mars"},
@@ -18,8 +15,7 @@ for exc_data in [
     {ORTH: "okt.", NORM: "oktober"},
     {ORTH: "nov.", NORM: "november"},
     {ORTH: "des.", NORM: "desember"},
-]:
-    _exc[exc_data[ORTH]] = [exc_data]
+]}
 
 
 for orth in [

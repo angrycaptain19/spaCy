@@ -41,7 +41,6 @@ class VietnameseTokenizer(DummyTokenizer):
     def __call__(self, text: str) -> Doc:
         if self.use_pyvi:
             words, spaces = self.ViTokenizer.spacy_tokenize(text)
-            return Doc(self.vocab, words=words, spaces=spaces)
         else:
             words = []
             spaces = []
@@ -49,7 +48,8 @@ class VietnameseTokenizer(DummyTokenizer):
                 words.extend(list(token.text))
                 spaces.extend([False] * len(token.text))
                 spaces[-1] = bool(token.whitespace_)
-            return Doc(self.vocab, words=words, spaces=spaces)
+
+        return Doc(self.vocab, words=words, spaces=spaces)
 
 
 class VietnameseDefaults(Language.Defaults):

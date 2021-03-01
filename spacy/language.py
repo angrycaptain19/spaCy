@@ -92,8 +92,7 @@ def create_tokenizer() -> Callable[["Language"], Tokenizer]:
 @registry.misc("spacy.LookupsDataLoader.v1")
 def load_lookups_data(lang, tables):
     util.logger.debug(f"Loading lookups from spacy-lookups-data: {tables}")
-    lookups = load_lookups(lang=lang, tables=tables)
-    return lookups
+    return load_lookups(lang=lang, tables=tables)
 
 
 class Language:
@@ -332,9 +331,11 @@ class Language:
 
         RETURNS (Dict[str, str]): Factory names, keyed by component names.
         """
-        factories = {}
-        for pipe_name, pipe in self._components:
-            factories[pipe_name] = self.get_pipe_meta(pipe_name).factory
+        factories = {
+            pipe_name: self.get_pipe_meta(pipe_name).factory
+            for pipe_name, pipe in self._components
+        }
+
         return SimpleFrozenDict(factories)
 
     @property
@@ -344,10 +345,12 @@ class Language:
 
         RETURNS (Dict[str, List[str]]): Labels keyed by component name.
         """
-        labels = {}
-        for name, pipe in self._components:
-            if hasattr(pipe, "labels"):
-                labels[name] = list(pipe.labels)
+        labels = {
+            name: list(pipe.labels)
+            for name, pipe in self._components
+            if hasattr(pipe, "labels")
+        }
+
         return SimpleFrozenDict(labels)
 
     @classmethod
@@ -408,8 +411,7 @@ class Language:
         """
         if name not in self._pipe_configs:
             raise ValueError(Errors.E960.format(name=name))
-        pipe_config = self._pipe_configs[name]
-        return pipe_config
+        return self._pipe_configs[name]
 
     @classmethod
     def factory(
@@ -684,7 +686,7 @@ class Language:
         # TODO: handle errors and mismatches (vectors etc.)
         if not isinstance(source, self.__class__):
             raise ValueError(Errors.E945.format(name=source_name, source=type(source)))
-        if not source_name in source.component_names:
+        if source_name not in source.component_names:
             raise KeyError(
                 Errors.E944.format(
                     name=source_name,
@@ -1439,8 +1441,7 @@ class Language:
                 n_process=n_process,
                 component_cfg=component_cfg,
             )
-            for doc, context in zip(docs, contexts):
-                yield (doc, context)
+            yield from zip(docs, contexts)
             return
         if component_cfg is None:
             component_cfg = {}
@@ -1472,8 +1473,7 @@ class Language:
             docs = (self.make_doc(text) for text in texts)
             for pipe in pipes:
                 docs = pipe(docs)
-        for doc in docs:
-            yield doc
+        yield from docs
 
     def _multiprocessing_pipe(
         self,
@@ -1663,7 +1663,7 @@ class Language:
                     source_name = pipe_cfg.get("component", pipe_name)
                     nlp.add_pipe(source_name, source=source_nlps[model], name=pipe_name)
         disabled_pipes = [*config["nlp"]["disabled"], *disable]
-        nlp._disabled = set(p for p in disabled_pipes if p not in exclude)
+        nlp._disabled = {p for p in disabled_pipes if p not in exclude}
         nlp.batch_size = config["nlp"]["batch_size"]
         nlp.config = filled if auto_fill else config
         if after_pipeline_creation is not None:
@@ -1785,10 +1785,9 @@ class Language:
         DOCS: https://spacy.io/api/language#to_disk
         """
         path = util.ensure_path(path)
-        serializers = {}
-        serializers["tokenizer"] = lambda p: self.tokenizer.to_disk(
+        serializers = {"tokenizer": lambda p: self.tokenizer.to_disk(
             p, exclude=["vocab"]
-        )
+        )}
         serializers["meta.json"] = lambda p: srsly.write_json(p, self.meta)
         serializers["config.cfg"] = lambda p: self.config.to_disk(p)
         for name, proc in self._components:

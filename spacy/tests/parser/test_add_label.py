@@ -25,8 +25,7 @@ def parser(vocab):
     }
     cfg = {"model": DEFAULT_PARSER_MODEL}
     model = registry.resolve(cfg, validate=True)["model"]
-    parser = DependencyParser(vocab, model, **config)
-    return parser
+    return DependencyParser(vocab, model, **config)
 
 
 def test_init_parser(parser):
@@ -39,7 +38,7 @@ def _train_parser(parser):
     parser.initialize(lambda: [_parser_example(parser)])
     sgd = Adam(0.001)
 
-    for i in range(5):
+    for _ in range(5):
         losses = {}
         doc = Doc(parser.vocab, words=["a", "b", "c", "d"])
         gold = {"heads": [1, 1, 3, 3], "deps": ["left", "ROOT", "left", "ROOT"]}
@@ -67,7 +66,7 @@ def test_add_label(parser):
     parser = _train_parser(parser)
     parser.add_label("right")
     sgd = Adam(0.001)
-    for i in range(100):
+    for _ in range(100):
         losses = {}
         parser.update([_parser_example(parser)], sgd=sgd, losses=losses)
     doc = Doc(parser.vocab, words=["a", "b", "c", "d"])

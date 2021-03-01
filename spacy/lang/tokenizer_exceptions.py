@@ -58,10 +58,7 @@ URL_PATTERN = (
 URL_MATCH = re.compile("(?u)" + URL_PATTERN).match
 
 
-BASE_EXCEPTIONS = {}
-
-
-for exc_data in [
+BASE_EXCEPTIONS = {exc_data[ORTH]: [exc_data] for exc_data in [
     {ORTH: " "},
     {ORTH: "\t"},
     {ORTH: "\\t"},
@@ -69,8 +66,7 @@ for exc_data in [
     {ORTH: "\\n"},
     {ORTH: "\u2014"},
     {ORTH: "\u00a0", NORM: "  "},
-]:
-    BASE_EXCEPTIONS[exc_data[ORTH]] = [exc_data]
+]}
 
 
 for orth in [

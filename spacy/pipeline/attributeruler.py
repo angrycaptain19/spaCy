@@ -150,10 +150,9 @@ class AttributeRuler(Pipe):
             attrs, morph_attrs = _split_morph_attrs(attrs)
             if "MORPH" not in attrs:
                 morph = self.vocab.morphology.add(morph_attrs)
-                attrs["MORPH"] = self.vocab.strings[morph]
             else:
                 morph = self.vocab.morphology.add(attrs["MORPH"])
-                attrs["MORPH"] = self.vocab.strings[morph]
+            attrs["MORPH"] = self.vocab.strings[morph]
             self.add([pattern], attrs)
 
     def load_from_morph_rules(
@@ -167,8 +166,8 @@ class AttributeRuler(Pipe):
 
         DOCS: https://spacy.io/api/attributeruler#load_from_morph_rules
         """
-        for tag in morph_rules:
-            for word in morph_rules[tag]:
+        for tag, value in morph_rules.items():
+            for word in value:
                 pattern = [{"ORTH": word, "TAG": tag}]
                 attrs = morph_rules[tag][word]
                 attrs, morph_attrs = _split_morph_attrs(attrs)
@@ -221,8 +220,7 @@ class AttributeRuler(Pipe):
         """All the added patterns."""
         all_patterns = []
         for i in range(len(self.attrs)):
-            p = {}
-            p["patterns"] = self.matcher.get(str(i))[1]
+            p = {"patterns": self.matcher.get(str(i))[1]}
             p["attrs"] = self._attrs_unnormed[i]
             p["index"] = self.indices[i]
             all_patterns.append(p)

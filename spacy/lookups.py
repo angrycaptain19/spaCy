@@ -28,7 +28,7 @@ def load_lookups(
     # TODO: import spacy_lookups_data instead of going via entry points here?
     lookups = Lookups()
     if lang not in registry.lookups:
-        if strict and len(tables) > 0:
+        if strict and tables:
             raise ValueError(Errors.E955.format(table=", ".join(tables), lang=lang))
         return lookups
     data = registry.lookups.get(lang)

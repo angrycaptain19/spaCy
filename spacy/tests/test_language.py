@@ -27,7 +27,6 @@ def nlp():
 def test_language_update(nlp):
     text = "hello world"
     annots = {"cats": {"POSITIVE": 1.0, "NEGATIVE": 0.0}}
-    wrongkeyannots = {"LABEL": True}
     doc = Doc(nlp.vocab, words=text.split(" "))
     example = Example.from_dict(doc, annots)
     nlp.update([example])
@@ -47,6 +46,7 @@ def test_language_update(nlp):
     with pytest.raises(ValueError):
         example = Example.from_dict(doc, None)
     with pytest.raises(KeyError):
+        wrongkeyannots = {"LABEL": True}
         example = Example.from_dict(doc, wrongkeyannots)
 
 
@@ -59,7 +59,7 @@ def test_language_evaluate(nlp):
     assert scores["speed"] > 0
 
     # test with generator
-    scores = nlp.evaluate(eg for eg in [example])
+    scores = nlp.evaluate(iter([example]))
     assert scores["speed"] > 0
 
     # Not allowed to call with just one Example
@@ -131,13 +131,12 @@ def nlp2(nlp, sample_vectors):
 
 @pytest.fixture
 def texts():
-    data = [
+    return [
         "Hello world.",
         "This is spacy.",
         "You can use multiprocessing with pipe method.",
         "Please try!",
     ]
-    return data
 
 
 @pytest.mark.parametrize("n_process", [1, 2])

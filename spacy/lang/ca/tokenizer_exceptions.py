@@ -3,9 +3,7 @@ from ...symbols import ORTH, NORM
 from ...util import update_exc
 
 
-_exc = {}
-
-for exc_data in [
+_exc = {exc_data[ORTH]: [exc_data] for exc_data in [
     {ORTH: "aprox.", NORM: "aproximadament"},
     {ORTH: "pàg.", NORM: "pàgina"},
     {ORTH: "p.ex.", NORM: "per exemple"},
@@ -24,8 +22,7 @@ for exc_data in [
     {ORTH: "núm", NORM: "número"},
     {ORTH: "St.", NORM: "sant"},
     {ORTH: "Sta.", NORM: "santa"},
-]:
-    _exc[exc_data[ORTH]] = [exc_data]
+]}
 
 # Times
 _exc["12m."] = [{ORTH: "12"}, {ORTH: "m.", NORM: "p.m."}]

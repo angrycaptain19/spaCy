@@ -65,8 +65,8 @@ def test_zh_extra_spaces(zh_tokenizer_char):
 
 
 def test_zh_unsupported_segmenter():
-    config = {"nlp": {"tokenizer": {"segmenter": "unk"}}}
     with pytest.raises(ConfigValidationError):
+        config = {"nlp": {"tokenizer": {"segmenter": "unk"}}}
         Chinese.from_config(config)
 
 

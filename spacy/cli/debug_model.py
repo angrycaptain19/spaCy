@@ -138,7 +138,7 @@ def debug_model(
     if model.has_ref("tok2vec") and model.get_ref("tok2vec").name == "tok2vec-listener":
         tok2vec = nlp.get_pipe("tok2vec")
     goldY = None
-    for e in range(3):
+    for _ in range(3):
         if tok2vec:
             tok2vec.update([Example.from_dict(x, {}) for x in X])
         Y, get_dX = model.begin_update(X)
@@ -165,12 +165,12 @@ def get_gradient(goldY, Y, ops):
 
 
 def _simulate_gold(element, counter=1):
-    if isinstance(element, Iterable):
-        for i in range(len(element)):
-            element[i] = _simulate_gold(element[i], counter + i)
-        return element
-    else:
+    if not isinstance(element, Iterable):
         return 1 / counter
+
+    for i in range(len(element)):
+        element[i] = _simulate_gold(element[i], counter + i)
+    return element
 
 
 def _sentences():
@@ -191,9 +191,11 @@ def _set_output_dim(model, nO):
     # simulating dim inference by directly setting the nO argument of the model
     if model.has_dim("nO") is None:
         model.set_dim("nO", nO)
-    if model.has_ref("output_layer"):
-        if model.get_ref("output_layer").has_dim("nO") is None:
-            model.get_ref("output_layer").set_dim("nO", nO)
+    if (
+        model.has_ref("output_layer")
+        and model.get_ref("output_layer").has_dim("nO") is None
+    ):
+        model.get_ref("output_layer").set_dim("nO", nO)
 
 
 def _print_model(model, print_settings):
@@ -239,7 +241,7 @@ def _print_matrix(value):
         return value
     result = str(value.shape) + " - sample: "
     sample_matrix = value
-    for d in range(value.ndim - 1):
+    for _ in range(sample_matrix.ndim - 1):
         sample_matrix = sample_matrix[0]
     sample_matrix = sample_matrix[0:5]
     result = result + str(sample_matrix)

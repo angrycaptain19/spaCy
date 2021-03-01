@@ -12,17 +12,17 @@ class PolishLemmatizer(Lemmatizer):
 
     @classmethod
     def get_lookups_config(cls, mode: str) -> Tuple[List[str], List[str]]:
-        if mode == "pos_lookup":
-            # fmt: off
-            required = [
-                "lemma_lookup_adj", "lemma_lookup_adp", "lemma_lookup_adv",
-                "lemma_lookup_aux", "lemma_lookup_noun", "lemma_lookup_num",
-                "lemma_lookup_part", "lemma_lookup_pron", "lemma_lookup_verb"
-            ]
-            # fmt: on
-            return (required, [])
-        else:
+        if mode != "pos_lookup":
             return super().get_lookups_config(mode)
+
+        # fmt: off
+        required = [
+            "lemma_lookup_adj", "lemma_lookup_adp", "lemma_lookup_adv",
+            "lemma_lookup_aux", "lemma_lookup_noun", "lemma_lookup_num",
+            "lemma_lookup_part", "lemma_lookup_pron", "lemma_lookup_verb"
+        ]
+        # fmt: on
+        return (required, [])
 
     def pos_lookup_lemmatize(self, token: Token) -> List[str]:
         string = token.text

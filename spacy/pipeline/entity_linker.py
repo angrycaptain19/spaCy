@@ -371,7 +371,7 @@ class EntityLinker(TrainablePipe):
                                     best_index = scores.argmax().item()
                                     best_candidate = candidates[best_index]
                                     final_kb_ids.append(best_candidate.entity_)
-        if not (len(final_kb_ids) == entity_count):
+        if len(final_kb_ids) != entity_count:
             err = Errors.E147.format(
                 method="predict", msg="result variables not of equal length"
             )
@@ -418,8 +418,7 @@ class EntityLinker(TrainablePipe):
 
         DOCS: https://spacy.io/api/entitylinker#to_disk
         """
-        serialize = {}
-        serialize["vocab"] = lambda p: self.vocab.to_disk(p)
+        serialize = {"vocab": lambda p: self.vocab.to_disk(p)}
         serialize["cfg"] = lambda p: srsly.write_json(p, self.cfg)
         serialize["kb"] = lambda p: self.kb.to_disk(p)
         serialize["model"] = lambda p: self.model.to_disk(p)
