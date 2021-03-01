@@ -36,9 +36,10 @@ TRAIN_DATA = [
 def test_initialize_examples():
     nlp = Language()
     nlp.add_pipe("senter")
-    train_examples = []
-    for t in TRAIN_DATA:
-        train_examples.append(Example.from_dict(nlp.make_doc(t[0]), t[1]))
+    train_examples = [
+        Example.from_dict(nlp.make_doc(t[0]), t[1]) for t in TRAIN_DATA
+    ]
+
     # you shouldn't really call this more than once, but for testing it should be fine
     nlp.initialize()
     nlp.initialize(get_examples=lambda: train_examples)
@@ -51,9 +52,10 @@ def test_initialize_examples():
 def test_overfitting_IO():
     # Simple test to try and quickly overfit the senter - ensuring the ML models work correctly
     nlp = English()
-    train_examples = []
-    for t in TRAIN_DATA:
-        train_examples.append(Example.from_dict(nlp.make_doc(t[0]), t[1]))
+    train_examples = [
+        Example.from_dict(nlp.make_doc(t[0]), t[1]) for t in TRAIN_DATA
+    ]
+
     # add some cases where SENT_START == -1
     train_examples[0].reference[10].is_sent_start = False
     train_examples[1].reference[1].is_sent_start = False
@@ -62,7 +64,7 @@ def test_overfitting_IO():
     nlp.add_pipe("senter")
     optimizer = nlp.initialize()
 
-    for i in range(200):
+    for _ in range(200):
         losses = {}
         nlp.update(train_examples, sgd=optimizer, losses=losses)
     assert losses["senter"] < 0.001

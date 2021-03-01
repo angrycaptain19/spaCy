@@ -31,8 +31,7 @@ def get_docs():
             hash_id = vocab.strings.add(word)
             vector = numpy.random.uniform(-1, 1, (7,))
             vocab.set_vector(hash_id, vector)
-    docs = [English(vocab)(t) for t in texts]
-    return docs
+    return [English(vocab)(t) for t in texts]
 
 
 # Test components with a model of type Model[List[Doc], List[Floats2d]]

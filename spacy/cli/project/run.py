@@ -164,10 +164,11 @@ def run_commands(
         # Also ensures cross-compatibility if user 1 writes "python3" (because
         # that's how it's set up on their system), and user 2 without the
         # shortcut tries to re-run the command.
-        if len(command) and command[0] in ("python", "python3"):
-            command[0] = sys.executable
-        elif len(command) and command[0] in ("pip", "pip3"):
-            command = [sys.executable, "-m", "pip", *command[1:]]
+        if len(command):
+            if command[0] in ("python", "python3"):
+                command[0] = sys.executable
+            elif command[0] in ("pip", "pip3"):
+                command = [sys.executable, "-m", "pip", *command[1:]]
         if not silent:
             print(f"Running command: {join_command(command)}")
         if not dry:

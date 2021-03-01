@@ -521,12 +521,12 @@ def test_overfitting_IO():
 
 
 def test_kb_serialization():
-    # Test that the KB can be used in a pipeline with a different vocab
-    vector_length = 3
     with make_tempdir() as tmp_dir:
         kb_dir = tmp_dir / "kb"
         nlp1 = English()
         assert "Q2146908" not in nlp1.vocab.strings
+        # Test that the KB can be used in a pipeline with a different vocab
+        vector_length = 3
         mykb = KnowledgeBase(nlp1.vocab, entity_vector_length=vector_length)
         mykb.add_entity(entity="Q2146908", freq=12, entity_vector=[6, -4, 3])
         mykb.add_alias(alias="Russ Cochran", entities=["Q2146908"], probabilities=[0.8])

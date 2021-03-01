@@ -16,8 +16,7 @@ from ...attrs import intify_attr
 
 @registry.architectures.register("spacy.Tok2VecListener.v1")
 def tok2vec_listener_v1(width: int, upstream: str = "*"):
-    tok2vec = Tok2VecListener(upstream_name=upstream, width=width)
-    return tok2vec
+    return Tok2VecListener(upstream_name=upstream, width=width)
 
 
 def get_tok2vec_width(model: Model):
@@ -222,7 +221,7 @@ def CharacterEmbed(
     if feature is None:
         raise ValueError(Errors.E911(feat=feature))
     if include_static_vectors:
-        model = chain(
+        return chain(
             concatenate(
                 chain(_character_embed.CharacterEmbed(nM=nM, nC=nC), list2ragged()),
                 chain(
@@ -238,7 +237,7 @@ def CharacterEmbed(
             ragged2list(),
         )
     else:
-        model = chain(
+        return chain(
             concatenate(
                 chain(_character_embed.CharacterEmbed(nM=nM, nC=nC), list2ragged()),
                 chain(
@@ -252,7 +251,6 @@ def CharacterEmbed(
             ),
             ragged2list(),
         )
-    return model
 
 
 @registry.architectures.register("spacy.MaxoutWindowEncoder.v2")

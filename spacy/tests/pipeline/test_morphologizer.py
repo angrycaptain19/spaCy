@@ -41,9 +41,10 @@ def test_no_label():
 def test_implicit_label():
     nlp = Language()
     nlp.add_pipe("morphologizer")
-    train_examples = []
-    for t in TRAIN_DATA:
-        train_examples.append(Example.from_dict(nlp.make_doc(t[0]), t[1]))
+    train_examples = [
+        Example.from_dict(nlp.make_doc(t[0]), t[1]) for t in TRAIN_DATA
+    ]
+
     nlp.initialize(get_examples=lambda: train_examples)
 
 
@@ -62,9 +63,10 @@ def test_initialize_examples():
     nlp = Language()
     morphologizer = nlp.add_pipe("morphologizer")
     morphologizer.add_label("POS" + Morphology.FIELD_SEP + "NOUN")
-    train_examples = []
-    for t in TRAIN_DATA:
-        train_examples.append(Example.from_dict(nlp.make_doc(t[0]), t[1]))
+    train_examples = [
+        Example.from_dict(nlp.make_doc(t[0]), t[1]) for t in TRAIN_DATA
+    ]
+
     # you shouldn't really call this more than once, but for testing it should be fine
     nlp.initialize()
     nlp.initialize(get_examples=lambda: train_examples)
@@ -78,12 +80,14 @@ def test_overfitting_IO():
     # Simple test to try and quickly overfit the morphologizer - ensuring the ML models work correctly
     nlp = English()
     nlp.add_pipe("morphologizer")
-    train_examples = []
-    for inst in TRAIN_DATA:
-        train_examples.append(Example.from_dict(nlp.make_doc(inst[0]), inst[1]))
+    train_examples = [
+        Example.from_dict(nlp.make_doc(inst[0]), inst[1])
+        for inst in TRAIN_DATA
+    ]
+
     optimizer = nlp.initialize(get_examples=lambda: train_examples)
 
-    for i in range(50):
+    for _ in range(50):
         losses = {}
         nlp.update(train_examples, sgd=optimizer, losses=losses)
     assert losses["morphologizer"] < 0.00001
@@ -124,7 +128,7 @@ def test_overfitting_IO():
         for token in example.reference:
             token.pos_ = ""
     optimizer = nlp.initialize(get_examples=lambda: train_examples)
-    for i in range(50):
+    for _ in range(50):
         losses = {}
         nlp.update(train_examples, sgd=optimizer, losses=losses)
     assert losses["morphologizer"] < 0.00001
@@ -142,14 +146,11 @@ def test_overfitting_IO():
     nlp.add_pipe("morphologizer")
     for example in train_examples:
         for token in example.reference:
-            if token.text == "ham":
-                token.pos_ = "NOUN"
-            else:
-                token.pos_ = ""
+            token.pos_ = "NOUN" if token.text == "ham" else ""
             token.set_morph(None)
     optimizer = nlp.initialize(get_examples=lambda: train_examples)
     print(nlp.get_pipe("morphologizer").labels)
-    for i in range(50):
+    for _ in range(50):
         losses = {}
         nlp.update(train_examples, sgd=optimizer, losses=losses)
     assert losses["morphologizer"] < 0.00001

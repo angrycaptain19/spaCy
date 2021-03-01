@@ -189,9 +189,12 @@ def debug_data(
 
     if "ner" in factory_names:
         # Get all unique NER labels present in the data
-        labels = set(
-            label for label in gold_train_data["ner"] if label not in ("O", "-", None)
-        )
+        labels = {
+            label
+            for label in gold_train_data["ner"]
+            if label not in ("O", "-", None)
+        }
+
         label_counts = gold_train_data["ner"]
         model_labels = _get_labels_from_model(nlp, "ner")
         new_labels = [l for l in labels if l not in model_labels]
@@ -382,17 +385,16 @@ def debug_data(
                 has_low_data_warning = True
 
         # rare labels in projectivized train
-        rare_projectivized_labels = []
-        for label in gold_train_data["deps"]:
+        rare_projectivized_labels = [
+            f"{label}: {gold_train_data['deps'][label]}"
+            for label in gold_train_data["deps"]
             if (
                 gold_train_data["deps"][label] <= DEP_LABEL_THRESHOLD
                 and DELIMITER in label
-            ):
-                rare_projectivized_labels.append(
-                    f"{label}: {gold_train_data['deps'][label]}"
-                )
+            )
+        ]
 
-        if len(rare_projectivized_labels) > 0:
+        if rare_projectivized_labels:
             msg.warn(
                 f"Low number of examples for {len(rare_projectivized_labels)} "
                 "label(s) in the projectivized dependency trees used for "
@@ -567,8 +569,8 @@ def _compile_gold(
 
 def _format_labels(labels: List[Tuple[str, int]], counts: bool = False) -> str:
     if counts:
-        return ", ".join([f"'{l}' ({c})" for l, c in labels])
-    return ", ".join([f"'{l}'" for l in labels])
+        return ", ".join(f"'{l}' ({c})" for l, c in labels)
+    return ", ".join(f"'{l}'" for l in labels)
 
 
 def _get_examples_without_label(data: Sequence[Example], label: str) -> int:

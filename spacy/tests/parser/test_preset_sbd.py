@@ -38,7 +38,7 @@ def parser(vocab):
     parser.initialize(lambda: [_parser_example(parser)])
     sgd = Adam(0.001)
 
-    for i in range(10):
+    for _ in range(10):
         losses = {}
         doc = Doc(vocab, words=["a", "b", "c", "d"])
         example = Example.from_dict(

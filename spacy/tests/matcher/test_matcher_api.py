@@ -393,9 +393,9 @@ def test_matcher_extension_set_membership(en_vocab):
 
 def test_matcher_basic_check(en_vocab):
     matcher = Matcher(en_vocab)
-    # Potential mistake: pass in pattern instead of list of patterns
-    pattern = [{"TEXT": "hello"}, {"TEXT": "world"}]
     with pytest.raises(ValueError):
+        # Potential mistake: pass in pattern instead of list of patterns
+        pattern = [{"TEXT": "hello"}, {"TEXT": "world"}]
         matcher.add("TEST", pattern)
 
 

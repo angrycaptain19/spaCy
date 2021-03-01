@@ -3,10 +3,7 @@ from ...symbols import ORTH
 from ...util import update_exc
 
 
-_exc = {}
-
-
-for orth in [
+_exc = {orth: [{ORTH: orth}] for orth in [
     "Adm.",
     "Art.",
     "art.",
@@ -48,8 +45,7 @@ for orth in [
     "tel.",
     "pág.",
     "pag.",
-]:
-    _exc[orth] = [{ORTH: orth}]
+]}
 
 
 TOKENIZER_EXCEPTIONS = update_exc(BASE_EXCEPTIONS, _exc)

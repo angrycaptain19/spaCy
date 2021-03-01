@@ -1,9 +1,6 @@
 from ...symbols import ORTH, NORM
 
 
-_exc = {}
-
-
 _abbr_exc = [
     {ORTH: "м", NORM: "метър"},
     {ORTH: "мм", NORM: "милиметър"},
@@ -18,8 +15,8 @@ _abbr_exc = [
     {ORTH: "дкл", NORM: "декалитър"},
     {ORTH: "л", NORM: "литър"},
 ]
-for abbr in _abbr_exc:
-    _exc[abbr[ORTH]] = [abbr]
+_exc = {abbr[ORTH]: [abbr] for abbr in _abbr_exc}
+
 
 _abbr_line_exc = [
     {ORTH: "г-жа", NORM: "госпожа"},

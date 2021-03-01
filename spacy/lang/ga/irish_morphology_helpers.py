@@ -7,10 +7,7 @@ vowels = broad_vowels + slender_vowels
 
 
 def ends_dentals(word):
-    if word != "" and word[-1] in ["d", "n", "t", "s"]:
-        return True
-    else:
-        return False
+    return word != "" and word[-1] in ["d", "n", "t", "s"]
 
 
 def devoice(word):

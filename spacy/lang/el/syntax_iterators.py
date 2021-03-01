@@ -36,7 +36,7 @@ def noun_chunks(doclike: Union[Doc, Span]) -> Iterator[Span]:
                         yield word.left_edge.i, potential_nmod.i + 1, np_label
                         flag = True
                         break
-            if flag is False:
+            if not flag:
                 prev_end = word.i
                 yield word.left_edge.i, word.i + 1, np_label
         elif word.dep == conj:

@@ -109,26 +109,21 @@ def evaluate(
 
     msg.table(results, title="Results")
 
-    if "morph_per_feat" in scores:
-        if scores["morph_per_feat"]:
-            print_prf_per_type(msg, scores["morph_per_feat"], "MORPH", "feat")
-            data["morph_per_feat"] = scores["morph_per_feat"]
-    if "dep_las_per_type" in scores:
-        if scores["dep_las_per_type"]:
-            print_prf_per_type(msg, scores["dep_las_per_type"], "LAS", "type")
-            data["dep_las_per_type"] = scores["dep_las_per_type"]
-    if "ents_per_type" in scores:
-        if scores["ents_per_type"]:
-            print_prf_per_type(msg, scores["ents_per_type"], "NER", "type")
-            data["ents_per_type"] = scores["ents_per_type"]
-    if "cats_f_per_type" in scores:
-        if scores["cats_f_per_type"]:
-            print_prf_per_type(msg, scores["cats_f_per_type"], "Textcat F", "label")
-            data["cats_f_per_type"] = scores["cats_f_per_type"]
-    if "cats_auc_per_type" in scores:
-        if scores["cats_auc_per_type"]:
-            print_textcats_auc_per_cat(msg, scores["cats_auc_per_type"])
-            data["cats_auc_per_type"] = scores["cats_auc_per_type"]
+    if "morph_per_feat" in scores and scores["morph_per_feat"]:
+        print_prf_per_type(msg, scores["morph_per_feat"], "MORPH", "feat")
+        data["morph_per_feat"] = scores["morph_per_feat"]
+    if "dep_las_per_type" in scores and scores["dep_las_per_type"]:
+        print_prf_per_type(msg, scores["dep_las_per_type"], "LAS", "type")
+        data["dep_las_per_type"] = scores["dep_las_per_type"]
+    if "ents_per_type" in scores and scores["ents_per_type"]:
+        print_prf_per_type(msg, scores["ents_per_type"], "NER", "type")
+        data["ents_per_type"] = scores["ents_per_type"]
+    if "cats_f_per_type" in scores and scores["cats_f_per_type"]:
+        print_prf_per_type(msg, scores["cats_f_per_type"], "Textcat F", "label")
+        data["cats_f_per_type"] = scores["cats_f_per_type"]
+    if "cats_auc_per_type" in scores and scores["cats_auc_per_type"]:
+        print_textcats_auc_per_cat(msg, scores["cats_auc_per_type"])
+        data["cats_auc_per_type"] = scores["cats_auc_per_type"]
 
     if displacy_path:
         factory_names = [nlp.get_pipe_meta(pipe).factory for pipe in nlp.pipe_names]

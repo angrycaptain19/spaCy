@@ -6,15 +6,15 @@ from spacy.tokens import Doc, Token
 
 def test_doc_retokenize_merge(en_tokenizer):
     text = "WKRO played songs by the beach boys all night"
-    attrs = {
-        "tag": "NAMED",
-        "lemma": "LEMMA",
-        "ent_type": "TYPE",
-        "morph": "Number=Plur",
-    }
     doc = en_tokenizer(text)
     assert len(doc) == 9
     with doc.retokenize() as retokenizer:
+        attrs = {
+            "tag": "NAMED",
+            "lemma": "LEMMA",
+            "ent_type": "TYPE",
+            "morph": "Number=Plur",
+        }
         retokenizer.merge(doc[4:7], attrs=attrs)
         retokenizer.merge(doc[7:9], attrs=attrs)
     assert len(doc) == 6
@@ -33,10 +33,10 @@ def test_doc_retokenize_merge(en_tokenizer):
 def test_doc_retokenize_merge_children(en_tokenizer):
     """Test that attachments work correctly after merging."""
     text = "WKRO played songs by the beach boys all night"
-    attrs = {"tag": "NAMED", "lemma": "LEMMA", "ent_type": "TYPE"}
     doc = en_tokenizer(text)
     assert len(doc) == 9
     with doc.retokenize() as retokenizer:
+        attrs = {"tag": "NAMED", "lemma": "LEMMA", "ent_type": "TYPE"}
         retokenizer.merge(doc[4:7], attrs=attrs)
     for word in doc:
         if word.i < word.head.i:

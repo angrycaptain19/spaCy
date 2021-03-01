@@ -54,7 +54,7 @@ def validate() -> None:
         msg.divider("Install updates")
         msg.text("Use the following commands to update the packages:")
         cmd = "python -m spacy download {}"
-        print("\n".join([cmd.format(pkg) for pkg in update_models]) + "\n")
+        print("\n".join(cmd.format(pkg) for pkg in update_models) + "\n")
     if na_models:
         msg.info(
             f"The following packages are custom spaCy pipelines or not "

@@ -57,7 +57,7 @@ class RussianLemmatizer(Lemmatizer):
         if not len(filtered_analyses):
             return [string.lower()]
         if morphology is None or (len(morphology) == 1 and POS in morphology):
-            return list(set([analysis.normal_form for analysis in filtered_analyses]))
+            return list({analysis.normal_form for analysis in filtered_analyses})
         if univ_pos in ("ADJ", "DET", "NOUN", "PROPN"):
             features_to_compare = ["Case", "Number", "Gender"]
         elif univ_pos == "NUM":
@@ -88,7 +88,7 @@ class RussianLemmatizer(Lemmatizer):
                 filtered_analyses.append(analysis)
         if not len(filtered_analyses):
             return [string.lower()]
-        return list(set([analysis.normal_form for analysis in filtered_analyses]))
+        return list(set(analysis.normal_form for analysis in filtered_analyses))
 
     def lookup_lemmatize(self, token: Token) -> List[str]:
         string = token.text
@@ -154,7 +154,7 @@ def oc2ud(oc_tag: str) -> Tuple[str, Dict[str, str]]:
         "Abbr": {"Abbr": "Yes"},
     }
     pos = "X"
-    morphology = dict()
+    morphology = {}
     unmatched = set()
     grams = oc_tag.replace(" ", ",").split(",")
     for gram in grams:
@@ -168,7 +168,7 @@ def oc2ud(oc_tag: str) -> Tuple[str, Dict[str, str]]:
                     morphology[categ] = gmap[gram]
         if not match:
             unmatched.add(gram)
-    while len(unmatched) > 0:
+    while unmatched:
         gram = unmatched.pop()
         if gram in ("Name", "Patr", "Surn", "Geox", "Orgn"):
             pos = "PROPN"

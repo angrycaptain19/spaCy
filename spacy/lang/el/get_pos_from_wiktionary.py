@@ -32,10 +32,7 @@ def get_pos_from_wiktionary():
         "μετοχή": "participles",
         "ρήμα": "verbs",
     }
-    expected_parts_dict = {}
-    for expected_part in expected_parts:
-        expected_parts_dict[expected_part] = []
-
+    expected_parts_dict = {expected_part: [] for expected_part in expected_parts}
     for title, text, pageid in extract_pages(wiktionary_file_path):
         if text.startswith("#REDIRECT"):
             continue

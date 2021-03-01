@@ -6,9 +6,7 @@ from ...symbols import ORTH
 from ...util import update_exc
 
 
-_exc = {}
-
-for orth in [
+_exc = {orth: [{ORTH: orth}] for orth in [
     "-e",
     "A.",
     "AG.",
@@ -630,9 +628,7 @@ for orth in [
     "őrgy.",
     "őrpk.",
     "őrv.",
-]:
-    _exc[orth] = [{ORTH: orth}]
-
+]}
 
 _ord_num_or_date = r"([A-Z0-9]+[./-])*(\d+\.?)"
 _num = r"[+\-]?\d+([,.]\d+)*"

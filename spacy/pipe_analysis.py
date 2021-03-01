@@ -126,7 +126,7 @@ def print_pipe_analysis(
     body = [[i, n, *[v for v in m.values()]] for i, (n, m) in enumerate(summary)]
     msg.table(body, header=header, divider=True, multiline=True)
     n_problems = sum(len(p) for p in analysis["problems"].values())
-    if any(p for p in analysis["problems"].values()):
+    if any(analysis["problems"].values()):
         msg.divider(f"Problems ({n_problems})")
         for name, problem in analysis["problems"].items():
             if problem:

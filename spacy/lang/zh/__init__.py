@@ -90,7 +90,7 @@ class ChineseTokenizer(DummyTokenizer):
 
     def __call__(self, text: str) -> Doc:
         if self.segmenter == Segmenter.jieba:
-            words = list([x for x in self.jieba_seg.cut(text, cut_all=False) if x])
+            words = [x for x in self.jieba_seg.cut(text, cut_all=False) if x]
             (words, spaces) = util.get_words_and_spaces(words, text)
             return Doc(self.vocab, words=words, spaces=spaces)
         elif self.segmenter == Segmenter.pkuseg:

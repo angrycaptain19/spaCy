@@ -40,12 +40,12 @@ def test_displacy_parse_deps(en_vocab):
 
 def test_displacy_invalid_arcs():
     renderer = DependencyRenderer()
-    words = [{"text": "This", "tag": "DET"}, {"text": "is", "tag": "VERB"}]
-    arcs = [
-        {"start": 0, "end": 1, "label": "nsubj", "dir": "left"},
-        {"start": -1, "end": 2, "label": "det", "dir": "left"},
-    ]
     with pytest.raises(ValueError):
+        words = [{"text": "This", "tag": "DET"}, {"text": "is", "tag": "VERB"}]
+        arcs = [
+            {"start": 0, "end": 1, "label": "nsubj", "dir": "left"},
+            {"start": -1, "end": 2, "label": "det", "dir": "left"},
+        ]
         renderer.render([{"words": words, "arcs": arcs}])
 
 

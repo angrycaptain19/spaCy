@@ -68,9 +68,7 @@ def like_num(text):
             return True
     if text in _num_words:
         return True
-    if text in _ordinal_words:
-        return True
-    return False
+    return text in _ordinal_words
 
 
 LEX_ATTRS = {LIKE_NUM: like_num}

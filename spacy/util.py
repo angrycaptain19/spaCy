@@ -109,10 +109,12 @@ class registry(thinc.registry):
     @classmethod
     def get_registry_names(cls) -> List[str]:
         """List all available registries."""
-        names = []
-        for name, value in inspect.getmembers(cls):
-            if not name.startswith("_") and isinstance(value, Registry):
-                names.append(name)
+        names = [
+            name
+            for name, value in inspect.getmembers(cls)
+            if not name.startswith("_") and isinstance(value, Registry)
+        ]
+
         return sorted(names)
 
     @classmethod
@@ -239,12 +241,11 @@ def get_lang_class(lang: str) -> "Language":
     # Check if language is registered / entry point is available
     if lang in registry.languages:
         return registry.languages.get(lang)
-    else:
-        try:
-            module = importlib.import_module(f".lang.{lang}", "spacy")
-        except ImportError as err:
-            raise ImportError(Errors.E048.format(lang=lang, err=err)) from err
-        set_lang_class(lang, getattr(module, module.__all__[0]))
+    try:
+        module = importlib.import_module(f".lang.{lang}", "spacy")
+    except ImportError as err:
+        raise ImportError(Errors.E048.format(lang=lang, err=err)) from err
+    set_lang_class(lang, getattr(module, module.__all__[0]))
     return registry.languages.get(lang)
 
 
@@ -423,7 +424,7 @@ def load_model_from_config(
     # This will automatically handle all codes registered via the languages
     # registry, including custom subclasses provided via entry points
     lang_cls = get_lang_class(nlp_config["lang"])
-    nlp = lang_cls.from_config(
+    return lang_cls.from_config(
         config,
         vocab=vocab,
         disable=disable,
@@ -431,7 +432,6 @@ def load_model_from_config(
         auto_fill=auto_fill,
         validate=validate,
     )
-    return nlp
 
 
 def get_sourced_components(
@@ -540,12 +540,11 @@ def load_config(
         return config.from_str(
             sys.stdin.read(), overrides=overrides, interpolate=interpolate
         )
-    else:
-        if not config_path or not config_path.exists() or not config_path.is_file():
-            raise IOError(Errors.E053.format(path=config_path, name="config.cfg"))
-        return config.from_disk(
-            config_path, overrides=overrides, interpolate=interpolate
-        )
+    if not config_path or not config_path.exists() or not config_path.is_file():
+        raise IOError(Errors.E053.format(path=config_path, name="config.cfg"))
+    return config.from_disk(
+        config_path, overrides=overrides, interpolate=interpolate
+    )
 
 
 def load_config_from_str(
@@ -830,18 +829,19 @@ def run_command(
         raise FileNotFoundError(
             Errors.E970.format(str_command=cmd_str, tool=cmd_list[0])
         ) from None
-    if ret.returncode != 0 and capture:
-        message = f"Error running command:\n\n{cmd_str}\n\n"
-        message += f"Subprocess exited with status {ret.returncode}"
-        if ret.stdout is not None:
-            message += f"\n\nProcess log (stdout and stderr):\n\n"
-            message += ret.stdout
-        error = subprocess.SubprocessError(message)
-        error.ret = ret
-        error.command = cmd_str
-        raise error
-    elif ret.returncode != 0:
-        sys.exit(ret.returncode)
+    if ret.returncode != 0:
+        if capture:
+            message = f"Error running command:\n\n{cmd_str}\n\n"
+            message += f"Subprocess exited with status {ret.returncode}"
+            if ret.stdout is not None:
+                message += f"\n\nProcess log (stdout and stderr):\n\n"
+                message += ret.stdout
+            error = subprocess.SubprocessError(message)
+            error.ret = ret
+            error.command = cmd_str
+            raise error
+        else:
+            sys.exit(ret.returncode)
     return ret
 
 
@@ -942,9 +942,7 @@ def get_cuda_stream(
     require: bool = False, non_blocking: bool = True
 ) -> Optional[CudaStream]:
     ops = get_current_ops()
-    if CudaStream is None:
-        return None
-    elif isinstance(ops, NumpyOps):
+    if CudaStream is None or isinstance(ops, NumpyOps):
         return None
     else:
         return CudaStream(non_blocking=non_blocking)
@@ -953,10 +951,9 @@ def get_cuda_stream(
 def get_async(stream, numpy_array):
     if cupy is None:
         return numpy_array
-    else:
-        array = cupy.ndarray(numpy_array.shape, order="C", dtype=numpy_array.dtype)
-        array.set(numpy_array, stream=stream)
-        return array
+    array = cupy.ndarray(numpy_array.shape, order="C", dtype=numpy_array.dtype)
+    array.set(numpy_array, stream=stream)
+    return array
 
 
 def read_regex(path: Union[str, Path]) -> Pattern:
@@ -964,8 +961,9 @@ def read_regex(path: Union[str, Path]) -> Pattern:
     with path.open(encoding="utf8") as file_:
         entries = file_.read().split("\n")
     expression = "|".join(
-        ["^" + re.escape(piece) for piece in entries if piece.strip()]
+        "^" + re.escape(piece) for piece in entries if piece.strip()
     )
+
     return re.compile(expression)
 
 
@@ -976,7 +974,7 @@ def compile_prefix_regex(entries: Iterable[Union[str, Pattern]]) -> Pattern:
         spacy.lang.punctuation.TOKENIZER_PREFIXES.
     RETURNS (Pattern): The regex object. to be used for Tokenizer.prefix_search.
     """
-    expression = "|".join(["^" + piece for piece in entries if piece.strip()])
+    expression = "|".join("^" + piece for piece in entries if piece.strip())
     return re.compile(expression)
 
 
@@ -987,7 +985,7 @@ def compile_suffix_regex(entries: Iterable[Union[str, Pattern]]) -> Pattern:
         spacy.lang.punctuation.TOKENIZER_SUFFIXES.
     RETURNS (Pattern): The regex object. to be used for Tokenizer.suffix_search.
     """
-    expression = "|".join([piece + "$" for piece in entries if piece.strip()])
+    expression = "|".join(piece + "$" for piece in entries if piece.strip())
     return re.compile(expression)
 
 
@@ -998,7 +996,7 @@ def compile_infix_regex(entries: Iterable[Union[str, Pattern]]) -> Pattern:
         spacy.lang.punctuation.TOKENIZER_INFIXES.
     RETURNS (regex object): The regex object. to be used for Tokenizer.infix_finditer.
     """
-    expression = "|".join([piece for piece in entries if piece.strip()])
+    expression = "|".join(piece for piece in entries if piece.strip())
     return re.compile(expression)
 
 
@@ -1075,7 +1073,7 @@ def expand_exc(
 def normalize_slice(
     length: int, start: int, stop: int, step: Optional[int] = None
 ) -> Tuple[int, int]:
-    if not (step is None or step == 1):
+    if step is not None and step != 1:
         raise ValueError(Errors.E057)
     if start is None:
         start = 0
@@ -1386,10 +1384,7 @@ def combine_score_weights(
         # components.
         total = sum(w_dict.values())
         for key, value in w_dict.items():
-            if total == 0:
-                weight = 0.0
-            else:
-                weight = round(value / total / len(all_weights), 2)
+            weight = 0.0 if total == 0 else round(value / total / len(all_weights), 2)
             prev_weight = result.get(key, 0.0)
             prev_weight = 0.0 if prev_weight is None else prev_weight
             result[key] = prev_weight + weight
@@ -1427,15 +1422,12 @@ def minibatch(items, size):
     """Iterate over batches of items. `size` may be an iterator,
     so that batch-size can vary on each step.
     """
-    if isinstance(size, int):
-        size_ = itertools.repeat(size)
-    else:
-        size_ = size
+    size_ = itertools.repeat(size) if isinstance(size, int) else size
     items = iter(items)
     while True:
         batch_size = next(size_)
         batch = list(itertools.islice(items, int(batch_size)))
-        if len(batch) == 0:
+        if not batch:
             break
         yield list(batch)
 

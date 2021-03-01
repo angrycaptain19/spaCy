@@ -41,7 +41,7 @@ def validate(schema: Type[BaseModel], obj: Dict[str, Any]) -> List[str]:
         errors = e.errors()
         data = defaultdict(list)
         for error in errors:
-            err_loc = " -> ".join([str(p) for p in error.get("loc", [])])
+            err_loc = " -> ".join(str(p) for p in error.get("loc", []))
             data[err_loc].append(error.get("msg"))
         return [f"[{loc}] {', '.join(msg)}" for loc, msg in data.items()]
 

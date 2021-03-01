@@ -292,11 +292,11 @@ class Scorer:
                     pred_per_feat.get(field, set()), gold_per_feat.get(field, set())
                 )
         score_key = f"{attr}_per_feat"
-        if any([len(v) for v in per_feat.values()]):
-            result = {k: v.to_dict() for k, v in per_feat.items()}
-            return {score_key: result}
-        else:
+        if not any(len(v) for v in per_feat.values()):
             return {score_key: None}
+
+        result = {k: v.to_dict() for k, v in per_feat.items()}
+        return {score_key: result}
 
     @staticmethod
     def score_spans(
@@ -323,14 +323,13 @@ class Scorer:
         DOCS: https://spacy.io/api/scorer#score_spans
         """
         score = PRFScore()
-        score_per_type = dict()
+        score_per_type = {}
         for example in examples:
             pred_doc = example.predicted
             gold_doc = example.reference
             # Option to handle docs without annotation for this attribute
-            if has_annotation is not None:
-                if not has_annotation(gold_doc):
-                    continue
+            if has_annotation is not None and not has_annotation(gold_doc):
+                continue
             # Find all labels in gold and doc
             labels = set(
                 [k.label_ for k in getter(gold_doc, attr)]
@@ -446,7 +445,7 @@ class Scorer:
                             f_per_type[label].tp += 1
                         elif pred_score >= threshold and gold_score == 0:
                             f_per_type[label].fp += 1
-                        elif pred_score < threshold and gold_score > 0:
+                        elif gold_score > 0:
                             f_per_type[label].fn += 1
             elif pred_cats and gold_cats:
                 # Get the highest-scoring for each.
@@ -526,9 +525,10 @@ class Scorer:
         """
         f_per_type = {}
         for example in examples:
-            gold_ent_by_offset = {}
-            for gold_ent in example.reference.ents:
-                gold_ent_by_offset[(gold_ent.start_char, gold_ent.end_char)] = gold_ent
+            gold_ent_by_offset = {
+                (gold_ent.start_char, gold_ent.end_char): gold_ent
+                for gold_ent in example.reference.ents
+            }
 
             for pred_ent in example.predicted.ents:
                 gold_span = gold_ent_by_offset.get(
@@ -565,7 +565,7 @@ class Scorer:
         macro_p = sum(prf.precision for prf in f_per_type.values()) / n_labels
         macro_r = sum(prf.recall for prf in f_per_type.values()) / n_labels
         macro_f = sum(prf.fscore for prf in f_per_type.values()) / n_labels
-        results = {
+        return {
             f"nel_score": micro_prf.fscore,
             f"nel_score_desc": "micro F",
             f"nel_micro_p": micro_prf.precision,
@@ -576,7 +576,6 @@ class Scorer:
             f"nel_macro_f": macro_f,
             f"nel_f_per_type": {k: v.to_dict() for k, v in f_per_type.items()},
         }
-        return results
 
     @staticmethod
     def score_deps(
@@ -611,7 +610,7 @@ class Scorer:
         """
         unlabelled = PRFScore()
         labelled = PRFScore()
-        labelled_per_dep = dict()
+        labelled_per_dep = {}
         missing_indices = set()
         for example in examples:
             gold_doc = example.reference
@@ -667,8 +666,9 @@ class Scorer:
                     pred_deps_per_dep.get(dep, set()), gold_deps_per_dep.get(dep, set())
                 )
             unlabelled.score_set(
-                set(item[:2] for item in pred_deps), set(item[:2] for item in gold_deps)
+                {item[:2] for item in pred_deps}, {item[:2] for item in gold_deps}
             )
+
         if len(unlabelled) > 0:
             return {
                 f"{attr}_uas": unlabelled.fscore,
@@ -830,16 +830,8 @@ def _roc_curve(y_true, y_score):
     fps = np.r_[0, fps]
     thresholds = np.r_[thresholds[0] + 1, thresholds]
 
-    if fps[-1] <= 0:
-        fpr = np.repeat(np.nan, fps.shape)
-    else:
-        fpr = fps / fps[-1]
-
-    if tps[-1] <= 0:
-        tpr = np.repeat(np.nan, tps.shape)
-    else:
-        tpr = tps / tps[-1]
-
+    fpr = np.repeat(np.nan, fps.shape) if fps[-1] <= 0 else fps / fps[-1]
+    tpr = np.repeat(np.nan, tps.shape) if tps[-1] <= 0 else tps / tps[-1]
     return fpr, tpr, thresholds
 
 

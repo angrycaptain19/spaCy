@@ -87,9 +87,7 @@ def like_num(text):
         return True
 
     # Check ordinal number
-    if text in _ordinal_words:
-        return True
-    return False
+    return text in _ordinal_words
 
 
 LEX_ATTRS = {LIKE_NUM: like_num}
